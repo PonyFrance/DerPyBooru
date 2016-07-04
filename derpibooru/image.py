@@ -43,12 +43,9 @@ class Image(object):
 
     for field, body in data.items():
       if not hasattr(self, field):
+        if field == "id":
+          body = int(body)
         setattr(self, field, body) 
-
-    if self.original_format == "gif":
-      setattr(self, "webm", self.representations["webm"])
-      setattr(self, "mp4", self.representations["mp4"])
-
 
   def __str__(self):
     return "Image({0})".format(self.id)

@@ -53,7 +53,7 @@ def request(params):
   request = get(search, params=p)
 
   while request.status_code == codes.ok:
-    images, image_count = request.json(), 0
+    images, image_count = request.json()["search"], 0
     for image in images:
       yield image
       image_count += 1
