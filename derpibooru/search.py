@@ -28,7 +28,7 @@ from sys import version_info
 
 from .request import get_images, url
 from .image import Image
-from .helpers import tags, api_key, sort_format, join_params, user_option, set_limit
+from .helpers import tags, api_key, sort_format, join_params, user_option, set_limit, validate_filter
 
 __all__ = [
   "Search"
@@ -44,7 +44,7 @@ class Search(object):
   easy.
   """
   def __init__(self, key="", q={}, sf="created_at", sd="desc", limit=50,
-               faves="", upvotes="", uploads="", watched=""):
+               faves="", upvotes="", uploads="", watched="", filter_id=""):
     """
     By default initializes an instance of Search with the parameters to get
     the first 50 images on Derpibooru's front page.
@@ -57,7 +57,8 @@ class Search(object):
       "faves": user_option(faves),
       "upvotes": user_option(upvotes),
       "uploads": user_option(uploads),
-      "watched": user_option(watched)
+      "watched": user_option(watched),
+      "filter_id": validate_filter(filter_id)
     }
     self._limit = set_limit(limit)
     self._search = get_images(self._params, self._limit)
@@ -84,14 +85,14 @@ class Search(object):
     Returns a search URL built on set parameters. Example based on default
     parameters:
 
-    https://derpiboo.ru/search?sd=desc&sf=created_at&q=%2A
+    https://derpibooru.org/search?sd=desc&sf=created_at&q=%2A
     """
     return url(self._params)
 
   def key(self, key=""):
     """
     Takes a user's API key string which applies content settings. API keys can
-    be found at <https://derpiboo.ru/users/edit>.
+    be found at <https://derpibooru.org/users/edit>.
     """
     params = join_params(self.parameters, {"key": key})
 
@@ -139,6 +140,18 @@ class Search(object):
     params = join_params(self.parameters, {"limit": limit})
 
     return self.__class__(**params)
+
+  def filter(self, filter_id=""):
+    """
+    Takes a filter's ID to be used in the current search context. Filter IDs can
+    be found at <https://derpibooru.org/filters/> by inspecting the URL parameters.
+    
+    If no filter is provided, the user's current filter will be used.
+    """
+    params = join_params(self.parameters, {"filter_id": filter_id})
+
+    return self.__class__(**params)
+
 
   def faves(self, option):
     """
